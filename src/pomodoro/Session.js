@@ -2,6 +2,8 @@ import React from "react";
 
 function Session({ session, currentDuration, minutesToDuration, secondsToDuration }) {
   if (!session) return null;
+  let ariaValueNow = ((((currentDuration*60) - session.timeRemaining) / (currentDuration*60))*100).toFixed()
+  let ariaValuePercent = ariaValueNow.toString() + "%"
   
   return (
     <div>
@@ -28,8 +30,8 @@ function Session({ session, currentDuration, minutesToDuration, secondsToDuratio
               role="progressbar"
               aria-valuemin="0"
               aria-valuemax="100"
-              aria-valuenow="0" // TODO: Increase aria-valuenow as elapsed time increases
-              style={{ width: "0%" }} // TODO: Increase width % as elapsed time increases
+              aria-valuenow={ariaValueNow} // TODO: Increase aria-valuenow as elapsed time increases
+              style={{ width:ariaValuePercent }} // TODO: Increase width % as elapsed time increases
             />
           </div>
         </div>
