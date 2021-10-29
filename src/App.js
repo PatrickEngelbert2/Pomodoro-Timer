@@ -2,6 +2,8 @@ import React from "react";
 import "./App.css";
 import Pomodoro from "./pomodoro/Pomodoro";
 
+console.log()
+
 function App() {
   return (
     <div className="App">
