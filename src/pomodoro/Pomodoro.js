@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import classNames from "../utils/class-names";
 import useInterval from "../utils/useInterval";
-import { minutesToDuration } from "../utils/duration/index"
-import Session from "./Session"
+import { minutesToDuration, secondsToDuration } from "../utils/duration/index";
+import Session from "./Session";
 
 // These functions are defined outside of the component to insure they do not have access to state
 // and are, therefore more likely to be pure.
@@ -64,7 +64,8 @@ function Pomodoro() {
    *
    * NOTE: You will not need to make changes to the callback function
    */
-  useInterval(() => {
+  useInterval(
+    () => {
       if (session.timeRemaining === 0) {
         new Audio("https://bigsoundbank.com/UPLOAD/mp3/1482.mp3").play();
         return setSession(nextSession(focusDuration, breakDuration));
@@ -89,27 +90,58 @@ function Pomodoro() {
               label: "Focusing",
               timeRemaining: focusDuration * 60,
             };
-          }
+          };
           return prevStateSession;
         });
-      }
+      };
       return nextState;
     });
-  }
+  };
 
-  function handleDecreaseTime () {
-    setFocusDuration(state => {
+  function handleDecreaseFocus() {
+    setFocusDuration((state) => {
       if (focusDuration > 5) {
-        state = state - 5
+        setFocusDuration(state - 5);
+      } else {
+        setFocusDuration(5)
       }
-    })
-  }
+    });
+  };
 
-  function handleIncreaseTime () {
-    setBreakDuration(state => {
-      state = state + 5
-    })
-  }
+  function handleIncreaseFocus() {
+    setFocusDuration((state) => {
+      if (focusDuration < 60) {
+        setFocusDuration(state + 5);
+      } else {
+        setFocusDuration(60)
+      }
+    });
+  };
+
+  function handleDecreaseBreak() {
+    setBreakDuration((state) => {
+      if (breakDuration > 1) {
+        setBreakDuration(state - 1);
+      } else {
+        setBreakDuration(1)
+      }
+    });
+  };
+
+  function handleIncreaseBreak() {
+    setBreakDuration((state) => {
+      if (breakDuration < 15) {
+        setBreakDuration(state + 1);
+      } else {
+        setBreakDuration(15)
+      }
+    });
+  };
+
+  function handleStop() {
+    setIsTimerRunning(false);
+    setSession(null);
+  };
 
   return (
     <div className="pomodoro">
@@ -126,7 +158,8 @@ function Pomodoro() {
                 type="button"
                 className="btn btn-secondary"
                 data-testid="decrease-focus"
-                onClick={handleDecreaseTime}
+                onClick={handleDecreaseFocus}
+                disabled={session}
               >
                 <span className="oi oi-minus" />
               </button>
@@ -135,7 +168,8 @@ function Pomodoro() {
                 type="button"
                 className="btn btn-secondary"
                 data-testid="increase-focus"
-                onClick={handleIncreaseTime}
+                onClick={handleIncreaseFocus}
+                disabled={session}
               >
                 <span className="oi oi-plus" />
               </button>
@@ -155,7 +189,8 @@ function Pomodoro() {
                   type="button"
                   className="btn btn-secondary"
                   data-testid="decrease-break"
-                  onClick={handleDecreaseTime}
+                  onClick={handleDecreaseBreak}
+                  disabled={session}
                 >
                   <span className="oi oi-minus" />
                 </button>
@@ -164,7 +199,8 @@ function Pomodoro() {
                   type="button"
                   className="btn btn-secondary"
                   data-testid="increase-break"
-                  onClick={handleIncreaseTime}
+                  onClick={handleIncreaseBreak}
+                  disabled={session}
                 >
                   <span className="oi oi-plus" />
                 </button>
@@ -202,6 +238,8 @@ function Pomodoro() {
               className="btn btn-secondary"
               data-testid="stop"
               title="Stop the session"
+              onClick={handleStop}
+              disabled={!session}
             >
               <span className="oi oi-media-stop" />
             </button>
@@ -209,10 +247,15 @@ function Pomodoro() {
         </div>
       </div>
       <div>
-        <Session session={session} currentDuration={session?.label ? focusDuration : breakDuration} minutesToDuration={minutesToDuration} />
+        <Session
+          session={session}
+          currentDuration={session?.label === "Focusing" ? focusDuration : breakDuration}
+          minutesToDuration={minutesToDuration}
+          secondsToDuration={secondsToDuration}
+        />
       </div>
     </div>
   );
-}
+};
 
 export default Pomodoro;
